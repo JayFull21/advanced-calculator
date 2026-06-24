@@ -1,3 +1,4 @@
+"""Strategy pattern: operation interface and concrete operation strategies."""
 from abc import ABC, abstractmethod
 
 from app.exceptions import ValidationError
@@ -9,7 +10,7 @@ class Operation(ABC):
     @abstractmethod
     def execute(self, a: float, b: float) -> float:
         """Perform the operation on two floats and return the result."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class Add(Operation):

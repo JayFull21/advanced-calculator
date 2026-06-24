@@ -1,3 +1,4 @@
+"""Observer pattern: Subject base + concrete Observers for calculation events."""
 from __future__ import annotations
 
 import logging
@@ -11,7 +12,7 @@ class Observer(ABC):
     @abstractmethod
     def update(self, event: dict) -> None:
         """React to an event published by a Subject."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class Subject:

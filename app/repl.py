@@ -1,3 +1,4 @@
+"""Interactive REPL for the Advanced Calculator."""
 from __future__ import annotations
 
 import logging
@@ -28,7 +29,6 @@ Available operations: {ops}
 class CalculatorREPL:
     def __init__(self, calc: Calculator | None = None):
         self.calc = calc or Calculator()
-        # Wire up a logging observer so each calc gets logged.
         self.calc.attach(LoggingObserver())
 
     def run(self, input_fn=input, output_fn=print) -> None:
@@ -95,7 +95,6 @@ class CalculatorREPL:
                 output_fn(str(e))
             return True
 
-        # Otherwise: assume calculation: <op> <a> <b>
         if len(parts) != 3:
             output_fn("Unknown command. Type 'help' for usage.")
             return True
@@ -108,11 +107,11 @@ class CalculatorREPL:
         return True
 
 
-def main() -> int:
+def main() -> int:  # pragma: no cover
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     CalculatorREPL().run()
     return 0
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())
