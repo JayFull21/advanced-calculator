@@ -1,7 +1,7 @@
 """Unit tests for validate_number and validate_operation_name."""
 import pytest
 from app.exceptions import ValidationError
-from app.validators import validate_number, validate_operation_name
+from app.input_validators import validate_number, validate_operation_name
 
 
 class TestValidateNumber:

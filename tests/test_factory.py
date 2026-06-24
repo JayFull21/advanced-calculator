@@ -35,7 +35,7 @@ class TestOperationFactory:
         assert names == {"add", "subtract", "multiply", "divide"}
 
     def test_factory_integrates_with_validate_operation_name(self):
-        from app.validators import validate_operation_name
+        from app.input_validators import validate_operation_name
 
         cleaned = validate_operation_name(
             "  ADD  ", OperationFactory.valid_operations()

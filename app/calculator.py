@@ -4,7 +4,7 @@ from app.factory import OperationFactory
 from app.history import HistoryManager
 from app.memento import CalculationMemento, HistoryCaretaker
 from app.observer import Subject
-from app.validators import validate_number, validate_operation_name
+from app.input_validators import validate_number, validate_operation_name
 
 
 class Calculator(Subject):
