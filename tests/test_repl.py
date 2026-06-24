@@ -34,7 +34,6 @@ class TestCommands:
 
     def test_history_with_entries(self, repl):
         outs = run_lines(repl, ["add 1 2", "history"])
-        # Should contain something resembling the calculation row
         assert any("add" in o for o in outs)
 
     def test_clear(self, repl):
@@ -83,7 +82,6 @@ class TestPersistenceCommands:
         assert any("Saved to" in o for o in outs)
         assert path.exists()
 
-        # New REPL, load it
         calc2 = Calculator(HistoryManager(csv_path=path))
         repl2 = CalculatorREPL(calc2)
         outs2 = run_lines(repl2, ["load", "history"])
@@ -99,7 +97,7 @@ class TestPersistenceCommands:
 
 class TestExit:
     def test_exit_command(self, repl):
-        outs = run_lines(repl, [])  # just "exit" from helper
+        outs = run_lines(repl, [])
         assert any("Goodbye" in o for o in outs)
 
     def test_quit_command(self, repl):

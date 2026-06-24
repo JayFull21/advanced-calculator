@@ -12,7 +12,7 @@ class Calculator(Subject):
 
     def __init__(self, history_manager: HistoryManager | None = None):
         super().__init__()
-        self._history = history_manager or HistoryManager()
+        self._history = history_manager if history_manager is not None else HistoryManager()
         self._caretaker = HistoryCaretaker()
 
     # ----- core API -----
