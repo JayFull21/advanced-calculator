@@ -34,7 +34,7 @@ class TestBasicCalculations:
 class TestValidationErrors:
     def test_invalid_operation_raises(self, calc):
         with pytest.raises(ValidationError):
-            calc.calculate("power", 2, 3)
+            calc.calculate("bogus", 2, 3)
 
     def test_invalid_number_raises(self, calc):
         with pytest.raises(ValidationError):

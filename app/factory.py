@@ -1,6 +1,18 @@
 """Factory pattern: builds Operation instances from operation name strings."""
 from app.exceptions import ValidationError
-from app.operations import Add, Subtract, Multiply, Divide, Operation
+from app.operations import (
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    Power,
+    Root,
+    Modulus,
+    IntDivide,
+    Percent,
+    AbsDiff,
+    Operation,
+)
 
 
 class OperationFactory:
@@ -11,6 +23,12 @@ class OperationFactory:
         "subtract": Subtract,
         "multiply": Multiply,
         "divide": Divide,
+        "power": Power,
+        "root": Root,
+        "modulus": Modulus,
+        "int_divide": IntDivide,
+        "percent": Percent,
+        "abs_diff": AbsDiff,
     }
 
     @classmethod

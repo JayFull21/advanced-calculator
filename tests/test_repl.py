@@ -61,7 +61,7 @@ class TestCommands:
         assert any("Unknown command" in o for o in outs)
 
     def test_invalid_operation_shows_error(self, repl):
-        outs = run_lines(repl, ["power 2 3"])
+        outs = run_lines(repl, ["bogus 2 3"])
         assert any("Error" in o for o in outs)
 
     def test_invalid_number_shows_error(self, repl):

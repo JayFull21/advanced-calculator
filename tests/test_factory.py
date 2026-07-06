@@ -24,7 +24,7 @@ class TestOperationFactory:
 
     def test_create_unsupported_raises(self):
         with pytest.raises(ValidationError, match="Unsupported operation"):
-            OperationFactory.create("power")
+            OperationFactory.create("bogus")
 
     def test_created_operation_is_usable(self):
         op = OperationFactory.create("add")
@@ -32,7 +32,10 @@ class TestOperationFactory:
 
     def test_valid_operations_returns_all_names(self):
         names = OperationFactory.valid_operations()
-        assert names == {"add", "subtract", "multiply", "divide"}
+        assert names == {
+            "add", "subtract", "multiply", "divide",
+            "power", "root", "modulus", "int_divide", "percent", "abs_diff",
+        }
 
     def test_factory_integrates_with_validate_operation_name(self):
         from app.input_validators import validate_operation_name
