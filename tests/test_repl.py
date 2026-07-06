@@ -110,3 +110,29 @@ class TestExit:
         def raise_eof(_):
             raise EOFError
         repl.run(input_fn=raise_eof, output_fn=lambda _: None)
+
+class TestAutoSaveToggle:
+    def test_auto_save_enabled_by_default(self, tmp_path, monkeypatch):
+        from app.observer import AutoSaveObserver
+
+        monkeypatch.delenv("CALCULATOR_AUTO_SAVE", raising=False)
+        calc = Calculator(HistoryManager(csv_path=tmp_path / "h.csv"))
+        repl = CalculatorREPL(calc)
+        assert any(isinstance(o, AutoSaveObserver) for o in repl.calc._observers)
+
+    def test_auto_save_disabled_via_env(self, tmp_path, monkeypatch):
+        from app.observer import AutoSaveObserver
+
+        monkeypatch.setenv("CALCULATOR_AUTO_SAVE", "false")
+        calc = Calculator(HistoryManager(csv_path=tmp_path / "h.csv"))
+        repl = CalculatorREPL(calc)
+        assert not any(isinstance(o, AutoSaveObserver) for o in repl.calc._observers)
+
+    def test_calculation_auto_saves_to_csv(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CALCULATOR_AUTO_SAVE", "true")
+        csv_path = tmp_path / "h.csv"
+        calc = Calculator(HistoryManager(csv_path=csv_path))
+        repl = CalculatorREPL(calc)
+        run_lines(repl, ["add 2 3"])
+        assert csv_path.exists()
+        assert "add" in csv_path.read_text()

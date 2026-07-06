@@ -94,3 +94,48 @@ class TestSubjectWithRealObservers:
         event = {"operation": "divide", "a": 10, "b": 2, "result": 5}
         subj.notify(event)
         assert hist.records == [event]
+
+class TestAutoSaveObserver:
+    def test_saves_history_after_calculation(self, tmp_path):
+        from app.calculator import Calculator
+        from app.history import HistoryManager
+        from app.observer import AutoSaveObserver
+
+        csv_path = tmp_path / "auto.csv"
+        calc = Calculator(HistoryManager(csv_path=csv_path))
+        calc.attach(AutoSaveObserver(calc))
+
+        calc.calculate("add", 2, 3)
+
+        assert csv_path.exists()
+        contents = csv_path.read_text()
+        assert "add" in contents
+        assert "5" in contents
+
+    def test_saves_on_every_calculation(self, tmp_path):
+        from app.calculator import Calculator
+        from app.history import HistoryManager
+        from app.observer import AutoSaveObserver
+
+        csv_path = tmp_path / "auto.csv"
+        calc = Calculator(HistoryManager(csv_path=csv_path))
+        calc.attach(AutoSaveObserver(calc))
+
+        calc.calculate("add", 1, 1)
+        calc.calculate("multiply", 3, 4)
+
+        contents = csv_path.read_text()
+        assert "multiply" in contents
+        assert "12" in contents
+
+    def test_logs_autosave(self, tmp_path, caplog):
+        import logging
+        from app.calculator import Calculator
+        from app.history import HistoryManager
+        from app.observer import AutoSaveObserver
+
+        caplog.set_level(logging.INFO, logger="calculator")
+        calc = Calculator(HistoryManager(csv_path=tmp_path / "auto.csv"))
+        calc.attach(AutoSaveObserver(calc))
+        calc.calculate("add", 2, 2)
+        assert "Auto-saved history" in caplog.text

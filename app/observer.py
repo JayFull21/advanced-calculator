@@ -58,3 +58,19 @@ class HistoryObserver(Observer):
 
     def update(self, event: dict) -> None:
         self.records.append(event)
+
+
+class AutoSaveObserver(Observer):
+    """Automatically saves calculation history to CSV after each calculation.
+
+    Holds a reference to the Calculator (the Subject) and triggers its
+    pandas-backed save whenever a new calculation event is published.
+    """
+
+    def __init__(self, calculator):
+        self._calculator = calculator
+        self._logger = logging.getLogger("calculator")
+
+    def update(self, event: dict) -> None:
+        path = self._calculator.save_history()
+        self._logger.info("Auto-saved history to %s", path)
