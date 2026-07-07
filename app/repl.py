@@ -7,6 +7,7 @@ import sys
 from app.calculator import Calculator
 from app.exceptions import DataLoadError, ValidationError
 from app.factory import OperationFactory
+from app.logger import configure_logging
 from app.observer import AutoSaveObserver, LoggingObserver
 
 
@@ -111,6 +112,7 @@ class CalculatorREPL:
 
 def main() -> int:  # pragma: no cover
     logging.basicConfig(level=logging.INFO, format="%(message)s")
+    configure_logging()
     CalculatorREPL().run()
     return 0
 
