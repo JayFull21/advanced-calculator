@@ -71,3 +71,18 @@ class TestValidateOperationName:
     def test_error_message_for_non_string(self):
         with pytest.raises(ValidationError, match="must be a string"):
             validate_operation_name(3.14, self.VALID_OPS)
+
+class TestValidateNumberMaxValue:
+    def test_within_max_passes(self):
+        assert validate_number("50", max_value=100) == 50.0
+
+    def test_exceeds_max_raises(self):
+        with pytest.raises(ValidationError, match="exceeds the maximum"):
+            validate_number("101", max_value=100)
+
+    def test_negative_exceeding_max_raises(self):
+        with pytest.raises(ValidationError, match="exceeds the maximum"):
+            validate_number("-101", max_value=100)
+
+    def test_no_max_means_unbounded(self):
+        assert validate_number("999999999999999") == 999999999999999.0

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from app.calculator_config import CalculatorConfig
 from app.factory import OperationFactory
 from app.history import HistoryManager
 from app.memento import CalculationMemento, HistoryCaretaker
@@ -10,9 +11,22 @@ from app.input_validators import validate_number, validate_operation_name
 class Calculator(Subject):
     """Facade over validators, factory, strategies, memento, observers, history."""
 
-    def __init__(self, history_manager: HistoryManager | None = None):
+    def __init__(
+        self,
+        history_manager: HistoryManager | None = None,
+        config: CalculatorConfig | None = None,
+    ):
         super().__init__()
-        self._history = history_manager if history_manager is not None else HistoryManager()
+        self.config = config if config is not None else CalculatorConfig()
+        self._history = (
+            history_manager
+            if history_manager is not None
+            else HistoryManager(
+                csv_path=self.config.history_file,
+                max_size=self.config.max_history_size,
+                encoding=self.config.default_encoding,
+            )
+        )
         self._caretaker = HistoryCaretaker()
 
     # ----- core API -----
@@ -21,14 +35,14 @@ class Calculator(Subject):
         name = validate_operation_name(
             operation_name, OperationFactory.valid_operations()
         )
-        a_val = validate_number(a)
-        b_val = validate_number(b)
+        a_val = validate_number(a, max_value=self.config.max_input_value)
+        b_val = validate_number(b, max_value=self.config.max_input_value)
 
         # Snapshot pre-mutation state for undo.
         self._caretaker.save(CalculationMemento(self._history.dataframe))
 
         operation = OperationFactory.create(name)
-        result = operation.execute(a_val, b_val)
+        result = round(operation.execute(a_val, b_val), self.config.precision)
 
         event = {"operation": name, "a": a_val, "b": b_val, "result": result}
         self._history.add(event)

@@ -19,3 +19,12 @@ class InvalidOperationError(CalculatorError):
 class DivisionByZeroError(CalculatorError):
     """Raised when a division (or root/power edge case) by zero is attempted."""
     pass
+
+class ConfigurationError(CalculatorError):
+    """Raised when an environment configuration value is invalid."""
+    pass
+
+
+class DataLoadError(CalculatorError):
+    """Raised when a history CSV file is malformed or unreadable."""
+    pass

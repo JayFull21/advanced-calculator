@@ -140,3 +140,30 @@ class TestObserverIntegration:
         calc.detach(hist)
         calc.calculate("add", 2, 3)
         assert hist.records == []
+
+class TestConfigIntegration:
+    def test_precision_rounds_results(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CALCULATOR_PRECISION", "2")
+        calc = Calculator(HistoryManager(csv_path=tmp_path / "h.csv"))
+        assert calc.calculate("divide", 10, 3) == 3.33
+
+    def test_max_input_value_enforced(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CALCULATOR_MAX_INPUT_VALUE", "100")
+        calc = Calculator(HistoryManager(csv_path=tmp_path / "h.csv"))
+        with pytest.raises(ValidationError, match="exceeds the maximum"):
+            calc.calculate("add", 101, 1)
+
+    def test_default_history_uses_config_paths(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CALCULATOR_HISTORY_FILE", str(tmp_path / "cfg.csv"))
+        calc = Calculator()  # no explicit HistoryManager
+        calc.calculate("add", 1, 1)
+        path = calc.save_history()
+        assert path == tmp_path / "cfg.csv"
+        assert path.exists()
+
+    def test_history_events_include_timestamp(self, tmp_path):
+        calc = Calculator(HistoryManager(csv_path=tmp_path / "h.csv"))
+        calc.calculate("add", 1, 2)
+        df = calc.get_history()
+        assert "timestamp" in df.columns
+        assert df.iloc[0]["timestamp"] is not None

@@ -2,13 +2,10 @@
 from __future__ import annotations
 
 import logging
-import os
 import sys
 
-from dotenv import load_dotenv
-
 from app.calculator import Calculator
-from app.exceptions import ValidationError
+from app.exceptions import DataLoadError, ValidationError
 from app.factory import OperationFactory
 from app.observer import AutoSaveObserver, LoggingObserver
 
@@ -31,17 +28,10 @@ Available operations: {ops}
 
 class CalculatorREPL:
     def __init__(self, calc: Calculator | None = None):
-        load_dotenv()
         self.calc = calc or Calculator()
         self.calc.attach(LoggingObserver())
-        if self._auto_save_enabled():
+        if self.calc.config.auto_save:
             self.calc.attach(AutoSaveObserver(self.calc))
-
-    @staticmethod
-    def _auto_save_enabled() -> bool:
-        """Read CALCULATOR_AUTO_SAVE from the environment (default: true)."""
-        raw = os.getenv("CALCULATOR_AUTO_SAVE", "true")
-        return raw.strip().lower() in {"1", "true", "yes", "on"}
 
     def run(self, input_fn=input, output_fn=print) -> None:
         output_fn("Advanced Calculator. Type 'help' for commands.")
@@ -103,7 +93,7 @@ class CalculatorREPL:
             try:
                 self.calc.load_history(path)
                 output_fn("History loaded.")
-            except FileNotFoundError as e:
+            except (FileNotFoundError, DataLoadError) as e:
                 output_fn(str(e))
             return True
 

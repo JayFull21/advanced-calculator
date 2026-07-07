@@ -1,16 +1,21 @@
-
 from app.exceptions import ValidationError
 
 
-def validate_number(value):
+def validate_number(value, max_value=None):
     """Validate that a raw input string can be converted to a float.
 
+    If max_value is given, the absolute value must not exceed it.
     Returns the converted float if valid, otherwise raises ValidationError.
     """
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
         raise ValidationError(f"Invalid number: {value!r}")
+    if max_value is not None and abs(number) > max_value:
+        raise ValidationError(
+            f"Input {number} exceeds the maximum allowed value of {max_value}"
+        )
+    return number
 
 
 def validate_operation_name(name, valid_operations):
