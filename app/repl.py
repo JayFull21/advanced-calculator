@@ -5,6 +5,7 @@ import logging
 import sys
 
 from app.calculator import Calculator
+from app.colors import error, info, success, warning
 from app.exceptions import DataLoadError, ValidationError
 from app.factory import OperationFactory
 from app.logger import configure_logging
@@ -35,7 +36,7 @@ class CalculatorREPL:
             self.calc.attach(AutoSaveObserver(self.calc))
 
     def run(self, input_fn=input, output_fn=print) -> None:
-        output_fn("Advanced Calculator. Type 'help' for commands.")
+        output_fn(info("Advanced Calculator. Type 'help' for commands."))
         while True:
             try:
                 raw = input_fn(">>> ")
@@ -55,58 +56,58 @@ class CalculatorREPL:
         cmd = parts[0].lower()
 
         if cmd in {"exit", "quit"}:
-            output_fn("Goodbye!")
+            output_fn(info("Goodbye!"))
             return False
         if cmd == "help":
-            output_fn(HELP_TEXT.format(
+            output_fn(info(HELP_TEXT.format(
                 ops=", ".join(sorted(OperationFactory.valid_operations()))
-            ))
+            )))
             return True
         if cmd == "history":
             df = self.calc.get_history()
-            output_fn("(empty)" if df.empty else df.to_string(index=False))
+            output_fn(info("(empty)" if df.empty else df.to_string(index=False)))
             return True
         if cmd == "clear":
             self.calc.clear_history()
-            output_fn("History cleared.")
+            output_fn(success("History cleared."))
             return True
         if cmd == "undo":
             try:
                 self.calc.undo()
-                output_fn("Undone.")
+                output_fn(success("Undone."))
             except IndexError:
-                output_fn("Nothing to undo.")
+                output_fn(warning("Nothing to undo."))
             return True
         if cmd == "redo":
             try:
                 self.calc.redo()
-                output_fn("Redone.")
+                output_fn(success("Redone."))
             except IndexError:
-                output_fn("Nothing to redo.")
+                output_fn(warning("Nothing to redo."))
             return True
         if cmd == "save":
             path = parts[1] if len(parts) > 1 else None
             saved_to = self.calc.save_history(path)
-            output_fn(f"Saved to {saved_to}")
+            output_fn(success(f"Saved to {saved_to}"))
             return True
         if cmd == "load":
             path = parts[1] if len(parts) > 1 else None
             try:
                 self.calc.load_history(path)
-                output_fn("History loaded.")
+                output_fn(success("History loaded."))
             except (FileNotFoundError, DataLoadError) as e:
-                output_fn(str(e))
+                output_fn(error(str(e)))
             return True
 
         if len(parts) != 3:
-            output_fn("Unknown command. Type 'help' for usage.")
+            output_fn(warning("Unknown command. Type 'help' for usage."))
             return True
         op, a, b = parts
         try:
             result = self.calc.calculate(op, a, b)
-            output_fn(f"= {result}")
+            output_fn(success(f"= {result}"))
         except ValidationError as e:
-            output_fn(f"Error: {e}")
+            output_fn(error(f"Error: {e}"))
         return True
 
 
